@@ -87,14 +87,14 @@ $minimal-z-index: max($github-header-z-index, $github-pull-request-float-header-
         width: 100%;
         height: 100%;
         display: block;
-        background-image: url('~@primer/octicons/build/svg/clippy.svg?inline');
+        background-image: url('~@primer/octicons-v2-react/build/svg/clippy-16.svg?inline');
         background-position: center;
         background-repeat: no-repeat;
         &.success {
-          background-image: url('~@primer/octicons/build/svg/check.svg?inline');
+          background-image: url('~@primer/octicons-v2-react/build/svg/check-16.svg?inline');
         }
         &.fail {
-          background-image: url('~@primer/octicons/build/svg/x.svg?inline');
+          background-image: url('~@primer/octicons-v2-react/build/svg/x-16.svg?inline');
         }
       }
     }
@@ -206,18 +206,19 @@ $minimal-z-index: max($github-header-z-index, $github-pull-request-float-header-
     user-select: none;
     width: 0;
     background: $bg-gray;
-    border-right: 1px solid $border-gray;
+    border-right: 1px solid $border-gray-dark;
     overflow: hidden;
+    box-sizing: content-box;
     &:hover,
     &:active {
       width: 16px;
       background: $bg-gray-light;
+      border-left: 1px solid $border-gray-dark;
     }
 
-    .octicon {
-      transform: rotate(90deg);
-      width: 14px;
-      height: 22px;
+    .octicon.Grabber {
+      margin-left: -2px;
+      width: 20px;
       font-size: 0;
     }
   }
@@ -227,7 +228,6 @@ $minimal-z-index: max($github-header-z-index, $github-pull-request-float-header-
     display: flex;
     flex-direction: column;
     background: $bg-gray-light;
-    border-right: 1px solid $border-gray-light;
     border-left: 1px solid $border-gray;
     overflow: hidden;
 
@@ -249,7 +249,7 @@ $minimal-z-index: max($github-header-z-index, $github-pull-request-float-header-
     .octicon-wrapper {
       display: inline-block;
       width: 16px;
-      height: 16px;
+      min-width: 16px; // prevent shrink when sidebar is narrow
       text-align: center;
     }
 
@@ -265,7 +265,6 @@ $minimal-z-index: max($github-header-z-index, $github-pull-request-float-header-
         padding: 10px;
         padding-right: 30px; // space for toggle button
         background: $bg-blue-light;
-        border-bottom: 1px solid $border-gray;
 
         .repo-name {
           font-weight: bolder;
@@ -273,6 +272,7 @@ $minimal-z-index: max($github-header-z-index, $github-pull-request-float-header-
       }
 
       .description {
+        border-top: 1px solid $border-gray;
         padding: 4px 10px;
       }
 
@@ -282,6 +282,7 @@ $minimal-z-index: max($github-header-z-index, $github-pull-request-float-header-
         display: flex;
         justify-content: center;
         align-items: center;
+        border-top: 1px solid $border-gray;
 
         .loading-indicator {
           display: flex;
@@ -290,12 +291,12 @@ $minimal-z-index: max($github-header-z-index, $github-pull-request-float-header-
           &-icon {
             width: 20px;
             height: 20px;
-            margin-right: 2px;
+            margin-right: 4px;
 
             .octicon {
               width: 20px;
               height: 20px;
-              animation: rotate 2s infinite linear;
+              animation: pulse-rotate 1.8s infinite ease;
             }
           }
         }
@@ -356,10 +357,10 @@ $minimal-z-index: max($github-header-z-index, $github-pull-request-float-header-
           justify-content: space-between;
           margin: 0;
           color: $blue;
-          line-height: 20px;
-          padding: 6px 10px;
+          line-height: 18px;
+          padding: 8px 10px;
           cursor: pointer;
-          border-top: 1px solid $border-gray-light;
+          border-bottom: 1px solid $border-gray-light;
           white-space: nowrap;
           transition: padding 0.3s ease; // on toggle expansion in search results
 
@@ -374,7 +375,8 @@ $minimal-z-index: max($github-header-z-index, $github-pull-request-float-header-
 
           &-type-icon {
             margin-right: 4px;
-            @include icon-size();
+            width: 16px;
+            // not specify height here, it'll break vertical alignment
 
             & + .octicon-wrapper,
             & + .node-item-icon {
@@ -401,10 +403,10 @@ $minimal-z-index: max($github-header-z-index, $github-pull-request-float-header-
           .node-item-label {
             overflow: hidden;
             text-overflow: ellipsis;
+            align-items: center;
           }
 
           .go-to-button {
-            vertical-align: middle;
             white-space: nowrap;
             background: transparent;
             border: none;
@@ -424,7 +426,7 @@ $minimal-z-index: max($github-header-z-index, $github-pull-request-float-header-
       background: $bg-gray-light;
       display: flex;
       flex-direction: column;
-      max-height: 100%;
+      max-height: calc(100vh - 120px);
       &-title {
         border-top: 1px solid $border-gray-light;
         padding: 10px;
@@ -467,9 +469,13 @@ $minimal-z-index: max($github-header-z-index, $github-pull-request-float-header-
             }
             select {
               width: 100%;
-              height: 36px; // same height as text inputs
-              background: $bg-white;
               -moz-appearance: menulist-button;
+              // make it look like text inputs
+              height: 36px;
+              background: $bg-white;
+              border: 1px solid $border-color;
+              border-radius: 6px;
+              box-shadow: inset 0px 2px 0px rgba(225, 228, 232, 0.2);
             }
             &.field-checkbox {
               padding-left: 20px;
@@ -551,6 +557,30 @@ $minimal-z-index: max($github-header-z-index, $github-pull-request-float-header-
     transform: rotateZ(0);
   }
   to {
+    transform: rotateZ(360deg);
+  }
+}
+
+@keyframes pulse-rotate {
+  0% {
+    transform: rotateZ(0);
+  }
+  20% {
+    transform: rotateZ(190deg);
+  }
+  30% {
+    transform: rotateZ(175deg);
+  }
+  50% {
+    transform: rotateZ(180deg);
+  }
+  70% {
+    transform: rotateZ(370deg);
+  }
+  80% {
+    transform: rotateZ(355deg);
+  }
+  100% {
     transform: rotateZ(360deg);
   }
 }
